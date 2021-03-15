@@ -2,6 +2,8 @@ package it.polito.tdp.alien;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+
+import it.polito.tdp.alien.model.Traduttore;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,8 +14,13 @@ public class EntryPoint extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
-        
+       
+    	FXMLLoader loader=new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
+    	Parent root=loader.load();
+    	// Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+    	FXMLController controller=loader.getController();	
+    	Traduttore model=new Traduttore();
+    	controller.setModel(model);
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/styles/Styles.css");
         

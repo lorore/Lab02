@@ -1,7 +1,10 @@
 package it.polito.tdp.alien;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import it.polito.tdp.alien.model.Traduttore;
 import javafx.event.ActionEvent;
@@ -57,9 +60,10 @@ public class FXMLController {
     		return;
     	}
     	
-    	String traduzione=model.traduci(input);
+    	Collection<String> traduzione=model.traduci(input);
     	
-    	txtResult.setText("La traduzione di "+input+" e' "+traduzione);
+    	txtResult.setText("La traduzione di "+input+" e' "+traduzione.toString());
+    	
     	}
 
     }

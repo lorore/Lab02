@@ -1,5 +1,6 @@
 package it.polito.tdp.alien.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,37 @@ public class Traduttore {
 			
 		}
 		return null;
+	}
+	
+	public int wildCard(String p1, String p2){
+		int n=0;
+		
+		char c='a';
+		while(c<='z') {
+			String parola=p1.concat(Character.toString(c)).concat(p2);
+			if(dizionario.containsKey(parola)) {
+				n++;
+			}
+			c++;
+		}
+		
+		return n;
+		
+	}
+	
+	public String parolaMisteriosa(String p1, String p2){
+		
+		char c='a';
+		while(c<='z') {
+			String parola=p1.concat(Character.toString(c)).concat(p2);
+			if(dizionario.containsKey(parola)) {
+				return parola;
+			}
+			c++;
+		}
+		
+		return null;
+	
 	}
 	
 }

@@ -44,6 +44,11 @@ public class FXMLController {
     @FXML
     void handleTranslation(ActionEvent event) {
     	String input= txtInput.getText().toLowerCase();
+    	if(input.equals("")) {
+    		txtResult.setText("Nessuna parola inserita");
+    		return;
+    	}
+    	
     	if(input.contains(" ")) {
     		String parolaA=input.substring(0, input.indexOf(" "));
     		String parolaU=input.substring(input.indexOf(" ")+1);
@@ -55,13 +60,74 @@ public class FXMLController {
     		model.aggiungiParola(parolaA, parolaU);
     	}
     	else {
+    		
+    	if(input.contains("?")) {
+    		String parte1="";
+    		String parte2="";
+    		String[] v=input.split("\\?");
+    		if(v.length>2) {
+    			txtResult.setText("Spiacenti, è ammesso al massimo un ?");
+    			return;
+    		}
+    		
+    		if(input.indexOf("?")==(input.length()-1)) {
+    			parte1=v[0];
+    			parte2="";
+    	
+    		}else if(input.indexOf("?")==0) {
+    			parte1="";
+    			parte2=v[1];
+    		}
+    		else {
+    			parte1=v[0];
+    			parte2=v[1];
+    		}
+    	
+    		if(!parte1.equals("")) {
+    			if(parte1.matches("[a-zA-Z]+")==false ) {
+    				txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z], al limite un ? ");
+            		return;
+    			}
+    		}
+    			
+    		if(!parte2.equals("")) {
+    			if(parte2.matches("[a-zA-Z]+")==false ) {
+    				txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z], al limite un ? ");
+            		return;
+    			}
+    		}
+    			
+    		
+    		
+    		
+    		if(model.wildCard(parte1, parte2)==0) {
+    			txtResult.setText("Hai inserito una parola con ?, ma questa"+ "\n"+ "non è contenuta nel dizionario");
+    			return;
+    		}
+    		else if(model.wildCard(parte1, parte2)>1) {
+    			txtResult.setText("Ci dispiace, ma a questa parola misteriosa corrisponde a più parole già salvate");
+    			return;
+    		}
+    		else {
+    			txtResult.setText("La parola misteriosa combacia con "+this.model.parolaMisteriosa(parte1, parte2)+" la traduzione è "+ this.model.traduci(this.model.parolaMisteriosa(parte1, parte2)));
+    			return;
+    		}
+    	}
+    			
+    		
+    		
     	if(input.matches("[a-zA-Z]+")==false) {
     		txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z] ");
     		return;
     	}
     	
-    	Collection<String> traduzione=model.traduci(input);
     	
+    	
+    	Collection<String> traduzione=model.traduci(input);
+    	if(traduzione==null) {
+    		txtResult.setText("Questa parola non è ancora stata aggiunta, impossibile tradurla");
+    		return;
+    	}
     	txtResult.setText("La traduzione di "+input+" e' "+traduzione.toString());
     	
     	}

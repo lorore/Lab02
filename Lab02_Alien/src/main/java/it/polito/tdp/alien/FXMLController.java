@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import it.polito.tdp.alien.model.Traduttore;
 import javafx.event.ActionEvent;
@@ -15,7 +16,9 @@ import javafx.scene.control.TextField;
 
 public class FXMLController {
 
-	private Traduttore model;
+	 
+	
+	private AlienDictionary aliendictionary=new AlienDictionary();
 	
     @FXML
     private ResourceBundle resources;
@@ -37,105 +40,67 @@ public class FXMLController {
 
     @FXML
     void handleClear(ActionEvent event) {
+    	this.aliendictionary.doReset();
     	txtResult.clear();
     	txtInput.clear();
     }
 
     @FXML
     void handleTranslation(ActionEvent event) {
-    	String input= txtInput.getText().toLowerCase();
-    	if(input.equals("")) {
-    		txtResult.setText("Nessuna parola inserita");
+    	txtResult.clear();
+    	String riga=txtInput.getText();
+    	
+    	if(riga==null || riga.length()==0) {
+    		txtResult.setText("Inserisci una o due parole");
     		return;
     	}
     	
-    	if(input.contains(" ")) {
-    		String parolaA=input.substring(0, input.indexOf(" "));
-    		String parolaU=input.substring(input.indexOf(" ")+1);
-    		if(parolaA.matches("[a-zA-Z]+")==false || parolaU.matches("[a-zA-Z]+")==false) {
-    			txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z] ");
-        		return;
-    		}	
-    		
-    		model.aggiungiParola(parolaA, parolaU);
+    	StringTokenizer st=new StringTokenizer(riga," ");
+    	if(!st.hasMoreTokens()) {
+    		txtResult.setText("Inserisci una o due parole");
+    		return;
     	}
-    	else {
+    	String alienWord=st.nextToken();
+    	if(st.hasMoreTokens()) {
+    		String translation=st.nextToken();
     		
-    	if(input.contains("?")) {
-    		String parte1="";
-    		String parte2="";
-    		String[] v=input.split("\\?");
-    		if(v.length>2) {
-    			txtResult.setText("Spiacenti, è ammesso al massimo un ?");
+    		if(!alienWord.matches("[a-zA-Z]*")|| !translation.matches("[a-zA-Z]*")) {
+    			txtResult.setText("inserire solo caratteri alfabetici");
     			return;
     		}
     		
-    		if(input.indexOf("?")==(input.length()-1)) {
-    			parte1=v[0];
-    			parte2="";
-    	
-    		}else if(input.indexOf("?")==0) {
-    			parte1="";
-    			parte2=v[1];
+    		this.aliendictionary.addWord(alienWord, translation);
+    		txtResult.setText("La parola \""+alienWord+"\"+ traduzione"+translation);
+    		
+    	}else {
+    		if(!alienWord.matches("[a-zA-Z?]*")) {
+    			txtResult.setText("inserire solo caratteri alfabetici");
+    			return;
+    		}
+    		String translation;
+    		//String translation=this.aliendictionary.translateWord(alienWord);
+    	/*	if(translation!=null) {
+    			txtResult.setText(translation);
+    		}else {
+    			txtResult.setText("La parola cercata non è presente nel dizionario");
+    			
+    		}*/
+    		if(alienWord.matches("[a-zA-Z?]*") && !alienWord.matches("[a-zA-Z]*")) {
+    		//vuol dire che è  in regola, ma ha punto interrogativo
+    			translation=this.aliendictionary.translateWordWildCard(alienWord);
     		}
     		else {
-    			parte1=v[0];
-    			parte2=v[1];
+    			translation=this.aliendictionary.translateWord(alienWord);
     		}
-    	
-    		if(!parte1.equals("")) {
-    			if(parte1.matches("[a-zA-Z]+")==false ) {
-    				txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z], al limite un ? ");
-            		return;
-    			}
-    		}
-    			
-    		if(!parte2.equals("")) {
-    			if(parte2.matches("[a-zA-Z]+")==false ) {
-    				txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z], al limite un ? ");
-            		return;
-    			}
-    		}
-    			
     		
-    		
-    		
-    		if(model.wildCard(parte1, parte2)==0) {
-    			txtResult.setText("Hai inserito una parola con ?, ma questa"+ "\n"+ "non è contenuta nel dizionario");
-    			return;
-    		}
-    		else if(model.wildCard(parte1, parte2)>1) {
-    			txtResult.setText("Ci dispiace, ma a questa parola misteriosa corrisponde a più parole già salvate");
-    			return;
+    		if(translation!=null) {
+    			txtResult.setText(translation);
     		}
     		else {
-    			txtResult.setText("La parola misteriosa combacia con "+this.model.parolaMisteriosa(parte1, parte2)+" la traduzione è "+ this.model.traduci(this.model.parolaMisteriosa(parte1, parte2)));
-    			return;
+    			txtResult.setText("La parola cercata non è presente");
     		}
     	}
-    			
-    		
-    		
-    	if(input.matches("[a-zA-Z]+")==false) {
-    		txtResult.setText("ERRORE: gli unici caratteri ammessi sono: [a-zA-Z] ");
-    		return;
-    	}
     	
-    	
-    	
-    	Collection<String> traduzione=model.traduci(input);
-    	if(traduzione==null) {
-    		txtResult.setText("Questa parola non è ancora stata aggiunta, impossibile tradurla");
-    		return;
-    	}
-    	txtResult.setText("La traduzione di "+input+" e' "+traduzione.toString());
-    	
-    	}
-
-    }
-    
-    public void setModel(Traduttore model) {
-    	this.model=model;
     }
 
     @FXML
